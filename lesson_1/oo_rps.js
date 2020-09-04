@@ -1,5 +1,7 @@
-const readline = require("readline-sync");
-/* RPS is a two player game in which each player chooses one of three possible moves: rock, paper, or scissors. The winner is chosen based on the following rules:
+/* RPS is a two player game in which each player
+chooses one of three possible moves:
+rock, paper, or scissors.
+The winner is chosen based on the following rules:
 rock crushes scissors (rock wins)
 scissors cuts paper (scissors wins)
 paper wraps rock (paper wins)
@@ -17,54 +19,64 @@ Rule
   - compare
 */
 
-function createPlayer(playerType) {
+const readline = require("readline-sync");
+
+function createPlayer() {
   return {
-    playerType: playerType,
-    move: null,
+    move: null
+  };
+}
 
+function createHuman() {
+  let playerObj = createPlayer();
+
+  let humanObj = {
     choose() {
-      if (this.isHuman()) {
-        let choice;
+      let choice;
 
-        while (true) {
-          console.log("Please choose rock, paper, or scissors:");
-          choice = readline.question();
-          if (["rock", "paper", "scissors"].includes(choice)) break;
-          console.log("Sorry, invalid choice.");
-        }
-
-        this.move = choice;
-
-      } else {
-        const choices = ["rock", "paper", "scissors"];
-        let randomIdx = Math.floor(Math.random() * choices.length);
-        this.move = choices[randomIdx];
+      while (true) {
+        console.log("Please choose rock, paper, or scissors:");
+        choice = readline.question();
+        if (["rock", "paper", "scissors"].includes(choice)) break;
+        console.log("Sorry, invalid choice.");
       }
-    },
 
-    isHuman() {
-      return this.playerType === "human";
+      this.move = choice;
     }
   };
+  return Object.assign(playerObj, humanObj);
 }
 
-function createMove() {
-  return {
-    // possible state: type of move (rock, paper, scissors)
+function createComputer() {
+  let playerObj = createPlayer();
+
+  let computerObj = {
+    choose() {
+      const choices = ["rock", "paper", "scissors"];
+      let randomIdx = Math.floor(Math.random() * choices.length);
+      this.move = choices[randomIdx];
+    }
   };
+  return Object.assign(playerObj, computerObj);
 }
 
-function createRule() {
-  // possible state? not clear whether Rules need state
-}
+// function createMove() {
+//   return {
+//     // possible state: type of move (rock, paper, scissors)
+//   };
+// }
 
-let compare = function(move1, move2) {
-  // not yet implemented
-};
+// function createRule() {
+//   // possible state? not clear whether Rules need state
+// }
+
+// let compare = function(move1, move2) {
+//   // not yet implemented
+// };
 
 const RPSGame = {
-  human: createPlayer("human"),
-  computer: createPlayer("computer"),
+  human: createHuman(),
+  computer: createComputer(),
 
   displayWelcomeMessage() {
     console.log("Welcome to Rock, Paper, Scissors!");
@@ -81,11 +93,11 @@ const RPSGame = {
     if ((humanMove === "rock" && computerMove === "scissors") ||
         (humanMove === "paper" && computerMove === "rock") ||
         (humanMove === "scissors" && computerMove === "paper")) {
-          console.log("You win!");
+      console.log("You win!");
     } else if ((humanMove === "rock" && computerMove === "paper") ||
                (humanMove === "paper" && computerMove === "scissors") ||
                (humanMove === "scissors" && computerMove === "rock")) {
-          console.log("Computer wins!");
+      console.log("Computer wins!");
     } else {
       console.log("It's a tie");
     }
