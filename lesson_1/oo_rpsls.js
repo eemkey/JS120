@@ -116,16 +116,18 @@ const RPSGame = {
     let lastHumanMoves = humanMovesHistory.slice(0, num);
     let lastComputerMoves = computerMovesHistory.slice(0, num);
     let spaces = 10;
+    console.log("");
     console.log(`   -Latest ${num} moves-`);
     console.log(`human          computer`);
     for (let count = 1; count <= num; count++) {
       let lengthOfString = String(lastHumanMoves[count - 1]).length;
       console.log(`${count}: ${lastHumanMoves[count - 1] === undefined ? " ".repeat(lengthOfString) : lastHumanMoves[count - 1]} ${" ".repeat(spaces - lengthOfString)} ${count}: ${lastComputerMoves[count - 1] === undefined ? " " : lastComputerMoves[count - 1]}`);
     }
-    console.log("");
   },
 
   displayCurrentScore(scoreBoard) {
+    console.log("");
+    console.log(`      -Scores-`);
     console.log(`human: ${scoreBoard.humanScore} computer: ${scoreBoard.computerScore}`);
   },
 
@@ -189,10 +191,10 @@ const RPSGame = {
     console.clear();
     let outcome = this.determineRoundWinner(human.move, computer.move);
     this.updateScoreBoard(outcome);
-    this.displayMovesHistory(human.movesHistory, computer.movesHistory);
     this.displayPickedChoices(human.move, computer.move);
     this.displayRoundWinner(outcome);
     this.displayCurrentScore(this.scoreBoard);
+    this.displayMovesHistory(human.movesHistory, computer.movesHistory);
   },
 
   play() {
