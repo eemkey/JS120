@@ -1,5 +1,5 @@
 const readline = require("readline-sync");
-const POINTS_TO_WIN = 3;
+const POINTS_TO_WIN = 5;
 const VALID_CHOICES = {
   rock: ["rock", "r"],
   paper: ["paper", "p"],
@@ -95,10 +95,7 @@ const RPSGame = {
   displayGoodbyeMessage() {
     console.log("Thanks for playing, Rock, Paper, Scissors. Goodbye!");
   },
-  displayWinner(outcome, humanMove, computerMove) {
-    console.log(`You chose ${humanMove}`);
-    console.log(`The computer chose ${computerMove}`);
-
+  displayWinner(outcome) {
     if (outcome === "human") {
       console.log("You win this round!");
     } else if (outcome === "computer") {
@@ -107,6 +104,12 @@ const RPSGame = {
       console.log("It's a tie this round!");
     }
   },
+
+  displayChoices(humanMove, computerMove) {
+    console.log(`You chose ${humanMove}`);
+    console.log(`The computer chose ${computerMove}`);
+  },
+
   displayCurrentScore(scoreBoard) {
     console.log(`human: ${scoreBoard.humanScore} computer: ${scoreBoard.computerScore}`);
   },
@@ -117,14 +120,15 @@ const RPSGame = {
       this.scoreBoard.computerScore++;
     }
   },
+
+  isWinner(player1, player2) {
+    return this.WINNING_COMBOS[player1].includes(player2);
+  },
+
   determineOutcome(humanMove, computerMove) {
-    if ((humanMove === "rock" && computerMove === "scissors") ||
-        (humanMove === "paper" && computerMove === "rock") ||
-        (humanMove === "scissors" && computerMove === "paper")) {
+    if (this.isWinner(humanMove, computerMove)) {
       return "human";
-    } else if ((humanMove === "rock" && computerMove === "paper") ||
-               (humanMove === "paper" && computerMove === "scissors") ||
-               (humanMove === "scissors" && computerMove === "rock")) {
+    } else if (this.isWinner(computerMove, humanMove)) {
       return "computer";
     } else {
       return "tie";
@@ -144,10 +148,19 @@ const RPSGame = {
   },
 
 
-  playAgain() {
+  getPlayAgainAnswer() {
     console.log("Would you like to play again? (y/n)");
-    let answer = readline.question();
-    return answer.toLowerCase()[0] === "y";
+    let answer = readline.question().toLowerCase();
+    
+    while ((answer[0] !== "n" && answer[0] !== "y") || answer.length !== 1) {
+      console.log("Invalid answer. Would you like to play again? (y/n)");
+      answer = readline.question().toLowerCase();
+    }
+    return answer;
+  },
+
+  isPlayAgain(answer) {
+    return answer === "y";
   },
 
   play() {
@@ -161,12 +174,13 @@ const RPSGame = {
   
         let outcome = this.determineOutcome(this.human.move, this.computer.move);
         this.updateScoreBoard(outcome);
-        this.displayWinner(outcome, this.human.move, this.computer.move);
+        this.displayChoices(this.human.move, this.computer.move);
+        this.displayWinner(outcome);
         this.displayCurrentScore(this.scoreBoard);
       }
 
       this.displayGrandWinner(this.scoreBoard);
-      if (!this.playAgain()) break;
+      if (!this.isPlayAgain(this.getPlayAgainAnswer())) break;
     }
 
     this.displayGoodbyeMessage();
