@@ -14,12 +14,13 @@ function createPlayer() {
   };
 }
 
-function convertChoice(input) {
+function convertToFullValidChoiceName(input) {
   for (let prop in VALID_CHOICES) {
     if (VALID_CHOICES[prop].includes(input)) {
       return prop;
     }
   }
+  return null;
 }
 
 function createHuman() {
@@ -30,13 +31,13 @@ function createHuman() {
       let choice;
 
       while (true) {
-        console.log("Please choose rock (r), paper (p), scissors (sc), lizard (l), or spock (sp):");
+        console.log("Choose (r)ock, (p)aper, (sc)issors, (l)izard, or (sp)ock");
         choice = readline.question();
         if ([].concat(...Object.values(VALID_CHOICES)).includes(choice)) break;
         console.log("Sorry, invalid choice.");
       }
 
-      this.move = convertChoice(choice);
+      this.move = convertToFullValidChoiceName(choice);
     }
   };
   return Object.assign(playerObj, humanObj);
@@ -57,10 +58,9 @@ function createComputer() {
 
 function createScoreBoard() {
   return {
-    pointsToWin: POINTS_TO_WIN,
     humanScore: 0,
     computerScore: 0
-  }
+  };
 }
 
 // function createMove() {
@@ -76,8 +76,6 @@ function createScoreBoard() {
 // let compare = function(move1, move2) {
 //   // not yet implemented
 // };
-
-
 
 const RPSGame = {
 
@@ -96,10 +94,12 @@ const RPSGame = {
   displayWelcomeMessage() {
     console.log("Welcome to Rock, Paper, Scissors, Lizard, Spock!");
   },
+
   displayGoodbyeMessage() {
-    console.log("Thanks for playing, Rock, Paper, Scissors, Lizard, Spock. Goodbye!");
+    console.log("Thanks for playing Rock, Paper, Scissors, Lizard, Spock!");
   },
-  displayWinner(outcome) {
+
+  displayRoundWinner(outcome) {
     if (outcome === "human") {
       console.log("You win this round!");
     } else if (outcome === "computer") {
@@ -109,7 +109,7 @@ const RPSGame = {
     }
   },
 
-  displayChoices(humanMove, computerMove) {
+  displayPickedChoices(humanMove, computerMove) {
     console.log(`You chose ${humanMove}`);
     console.log(`The computer chose ${computerMove}`);
   },
@@ -117,10 +117,11 @@ const RPSGame = {
   displayCurrentScore(scoreBoard) {
     console.log(`human: ${scoreBoard.humanScore} computer: ${scoreBoard.computerScore}`);
   },
+
   updateScoreBoard(outcome) {
     if (outcome === "human") {
       this.scoreBoard.humanScore++;
-    } else if (outcome === "computer"){
+    } else if (outcome === "computer") {
       this.scoreBoard.computerScore++;
     }
   },
@@ -129,7 +130,7 @@ const RPSGame = {
     return this.WINNING_COMBOS[player1].includes(player2);
   },
 
-  determineOutcome(humanMove, computerMove) {
+  determineRoundWinner(humanMove, computerMove) {
     if (this.isWinner(humanMove, computerMove)) {
       return "human";
     } else if (this.isWinner(computerMove, humanMove)) {
@@ -147,15 +148,15 @@ const RPSGame = {
     }
   },
 
-  detectGrandWinner(scoreBoard) {
-    return scoreBoard.computerScore === POINTS_TO_WIN || scoreBoard.humanScore === POINTS_TO_WIN;
+  determineGrandWinner(scoreBoard) {
+    return scoreBoard.computerScore === POINTS_TO_WIN ||
+    scoreBoard.humanScore === POINTS_TO_WIN;
   },
-
 
   getPlayAgainAnswer() {
     console.log("Would you like to play again? (y/n)");
     let answer = readline.question().toLowerCase();
-    
+
     while ((answer[0] !== "n" && answer[0] !== "y") || answer.length !== 1) {
       console.log("Invalid answer. Would you like to play again? (y/n)");
       answer = readline.question().toLowerCase();
@@ -167,20 +168,25 @@ const RPSGame = {
     return answer === "y";
   },
 
+  playRound() {
+    let human = this.human;
+    let computer = this.computer;
+    human.choose();
+    computer.choose();
+    let outcome = this.determineRoundWinner(human.move, computer.move);
+    this.updateScoreBoard(outcome);
+    this.displayPickedChoices(human.move, computer.move);
+    this.displayRoundWinner(outcome);
+    this.displayCurrentScore(this.scoreBoard);
+  },
+
   play() {
     this.displayWelcomeMessage();
 
     while (true) {
       this.scoreBoard = createScoreBoard();
-      while (!this.detectGrandWinner(this.scoreBoard)) {
-        this.human.choose();
-        this.computer.choose();
-  
-        let outcome = this.determineOutcome(this.human.move, this.computer.move);
-        this.updateScoreBoard(outcome);
-        this.displayChoices(this.human.move, this.computer.move);
-        this.displayWinner(outcome);
-        this.displayCurrentScore(this.scoreBoard);
+      while (!this.determineGrandWinner(this.scoreBoard)) {
+        this.playRound();
       }
 
       this.displayGrandWinner(this.scoreBoard);
