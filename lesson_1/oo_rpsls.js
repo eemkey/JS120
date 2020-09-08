@@ -31,6 +31,7 @@ function createHuman() {
       let choice;
 
       while (true) {
+        console.log("");
         console.log("Choose (r)ock, (p)aper, (sc)issors, (l)izard, or (sp)ock");
         choice = readline.question();
         if ([].concat(...Object.values(VALID_CHOICES)).includes(choice)) break;
@@ -96,10 +97,12 @@ const RPSGame = {
   },
 
   displayGoodbyeMessage() {
+    console.log("");
     console.log("Thanks for playing Rock, Paper, Scissors, Lizard, Spock!");
   },
 
   displayRoundWinner(outcome) {
+    console.log("");
     if (outcome === "human") {
       console.log("You win this round!");
     } else if (outcome === "computer") {
@@ -141,6 +144,7 @@ const RPSGame = {
   },
 
   displayGrandWinner(scoreBoard) {
+    console.log("");
     if (scoreBoard.humanScore === POINTS_TO_WIN) {
       console.log("You are the grand winner!");
     } else {
@@ -154,6 +158,7 @@ const RPSGame = {
   },
 
   getPlayAgainAnswer() {
+    console.log("");
     console.log("Would you like to play again? (y/n)");
     let answer = readline.question().toLowerCase();
 
@@ -173,6 +178,7 @@ const RPSGame = {
     let computer = this.computer;
     human.choose();
     computer.choose();
+    console.clear();
     let outcome = this.determineRoundWinner(human.move, computer.move);
     this.updateScoreBoard(outcome);
     this.displayPickedChoices(human.move, computer.move);
@@ -181,9 +187,9 @@ const RPSGame = {
   },
 
   play() {
-    this.displayWelcomeMessage();
-
     while (true) {
+      console.clear();
+      this.displayWelcomeMessage();
       this.scoreBoard = createScoreBoard();
       while (!this.determineGrandWinner(this.scoreBoard)) {
         this.playRound();
