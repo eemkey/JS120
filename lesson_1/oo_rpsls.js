@@ -10,7 +10,8 @@ const VALID_CHOICES = {
 
 function createPlayer() {
   return {
-    move: null
+    move: null,
+    movesHistory: []
   };
 }
 
@@ -32,13 +33,14 @@ function createHuman() {
 
       while (true) {
         console.log("");
-        console.log("Choose (r)ock, (p)aper, (sc)issors, (l)izard, or (sp)ock");
+        console.log("Pick (r)ock, (p)aper, (sc)issors, (l)izard, or (sp)ock:");
         choice = readline.question();
         if ([].concat(...Object.values(VALID_CHOICES)).includes(choice)) break;
         console.log("Sorry, invalid choice.");
       }
 
       this.move = convertToFullValidChoiceName(choice);
+      this.movesHistory.unshift(this.move);
     }
   };
   return Object.assign(playerObj, humanObj);
@@ -52,6 +54,7 @@ function createComputer() {
       const choices = Object.keys(VALID_CHOICES);
       let randomIdx = Math.floor(Math.random() * choices.length);
       this.move = choices[randomIdx];
+      this.movesHistory.unshift(this.move);
     }
   };
   return Object.assign(playerObj, computerObj);
@@ -64,19 +67,9 @@ function createScoreBoard() {
   };
 }
 
-// function createMove() {
-//   return {
-//     // possible state: type of move (rock, paper, scissors)
-//   };
-// }
-
 // function createRule() {
 //   // possible state? not clear whether Rules need state
 // }
-
-// let compare = function(move1, move2) {
-//   // not yet implemented
-// };
 
 const RPSGame = {
 
@@ -94,6 +87,7 @@ const RPSGame = {
 
   displayWelcomeMessage() {
     console.log("Welcome to Rock, Paper, Scissors, Lizard, Spock!");
+    console.log(`The first player to reach ${POINTS_TO_WIN} points is the grand winner.`);
   },
 
   displayGoodbyeMessage() {
@@ -113,8 +107,22 @@ const RPSGame = {
   },
 
   displayPickedChoices(humanMove, computerMove) {
-    console.log(`You chose ${humanMove}`);
-    console.log(`The computer chose ${computerMove}`);
+    console.log(`You chose ${humanMove.toUpperCase()}`);
+    console.log(`The computer chose ${computerMove.toUpperCase()}`);
+  },
+
+  displayMovesHistory(humanMovesHistory, computerMovesHistory) {
+    let num = 5;
+    let lastHumanMoves = humanMovesHistory.slice(0, num);
+    let lastComputerMoves = computerMovesHistory.slice(0, num);
+    let spaces = 10;
+    console.log(`   -Latest ${num} moves-`);
+    console.log(`human          computer`);
+    for (let count = 1; count <= num; count++) {
+      let lengthOfString = String(lastHumanMoves[count - 1]).length;
+      console.log(`${count}: ${lastHumanMoves[count - 1] === undefined ? " ".repeat(lengthOfString) : lastHumanMoves[count - 1]} ${" ".repeat(spaces - lengthOfString)} ${count}: ${lastComputerMoves[count - 1] === undefined ? " " : lastComputerMoves[count - 1]}`);
+    }
+    console.log("");
   },
 
   displayCurrentScore(scoreBoard) {
@@ -181,6 +189,7 @@ const RPSGame = {
     console.clear();
     let outcome = this.determineRoundWinner(human.move, computer.move);
     this.updateScoreBoard(outcome);
+    this.displayMovesHistory(human.movesHistory, computer.movesHistory);
     this.displayPickedChoices(human.move, computer.move);
     this.displayRoundWinner(outcome);
     this.displayCurrentScore(this.scoreBoard);
