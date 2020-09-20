@@ -55,8 +55,50 @@ class TTTGame {
     // need a board and two players.
   }
 
+  displayWelcomeMessage() {
+    // shows a welcome message.
+  }
+
+  displayGoodByeMessage() {
+    // shows a goodbye message.
+  }
+
+  displayResults() {
+    // shows the results of the game (win, lose, tie).
+  }
+
+  displayBoard() {
+    // displays the board, including its current state.
+  }
+
+  firstPlayerMoves() {
+    // the first player makes a move.
+  }
+
+  secondPlayerMoves() {
+    // the second player makes a move.
+  }
+
+  gameOver() {
+    return false;
+  }
+
   play() {
     // orchestrate game play.
+    this.displayWelcomeMessage();
+
+    while (true) {
+      this.displayBoard();
+      this.firstPlayerMoves();
+      if (this.gameOver()) break;
+
+      this.secondPlayerMoves();
+      if (this.gameOver()) break;
+      break;
+    }
+
+    this.displayResults();
+    this.displayGoodByeMessage();
   }
 }
 
