@@ -1,15 +1,24 @@
+class Square {
+  constructor(marker = " ") {
+    this.marker = marker;
+  }
+  toString() {
+    return this.marker;
+  }
+}
+
 class Board {
   constructor() {
     this.squares = {
-      "1": "X",
-      "2": " ",
-      "3": " ",
-      "4": " ",
-      "5": "O",
-      "6": " ",
-      "7": " ",
-      "8": " ",
-      "9": " ",
+      "1": new Square(),
+      "2": new Square(),
+      "3": new Square("X"),
+      "4": new Square(),
+      "5": new Square("O"),
+      "6": new Square(),
+      "7": new Square("X"), 
+      "8": new Square(),
+      "9": new Square()
     };
   }
   display() {
@@ -26,12 +35,6 @@ class Board {
     console.log(`  ${this.squares["7"]}  |  ${this.squares["8"]}  |  ${this.squares["9"]}`);
     console.log("     |     |");
     console.log("");
-  }
-}
-
-class Square {
-  constructor() {
-    // need to keep track of this square's marker.
   }
 }
 
