@@ -129,7 +129,13 @@ class TTTGame {
   }
 
   displayResults() {
-    // shows the results of the game (win, lose, tie).
+    if (this.isWinner(this.human)) {
+      console.log("You won! Congratulations!");
+    } else if (this.isWinner(this.computer)) {
+      console.log("Computer won! Better luck next time!");
+    } else {
+      console.log("A tie game.");
+    }
   }
 
   humanMoves() {
@@ -168,6 +174,12 @@ class TTTGame {
     return TTTGame.POSSIBLE_WINNING_ROWS.some(row => {
       return this.board.countMarkersFor(this.human, row) === 3 ||
              this.board.countMarkersFor(this.computer, row) === 3;
+    });
+  }
+
+  isWinner(player) {
+    return TTTGame.POSSIBLE_WINNING_ROWS.some(row => {
+      return this.board.countMarkersFor(player, row) === 3;
     });
   }
 
