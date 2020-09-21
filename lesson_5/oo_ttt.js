@@ -1,3 +1,5 @@
+let readline = require("readline-sync");
+
 class Square {
   static UNUSED_SQUARE = " ";
   static HUMAN_MARKER = "X";
@@ -10,6 +12,10 @@ class Square {
   toString() {
     return this.marker;
   }
+
+  setMarker(marker) {
+    this.marker = marker;
+  }
 }
 
 class Board {
@@ -18,6 +24,11 @@ class Board {
     for (let counter = 1; counter <= 9; counter++) {
       this.squares[String(counter)] = new Square();
     }
+  }
+  
+  markSquareAt(key, marker) {
+    this.squares[key].setMarker(marker);
+
   }
   
   display() {
@@ -43,36 +54,26 @@ class Row {
   }
 }
 
-class Marker {
-  constructor() {
-    // represents a player's piece on the board.
-  }
-}
-
 class Player {
-  constructor() {
-    // "X" or "O" to represent the player's symbol.
+  constructor(marker) {
+    this.marker = marker;
   }
 
-  mark() {
-    // need to be able to mark the board with the player's marker.
-    // how to access the board?
-  }
-
-  play() {
-    // need a way for the player to play the game.
-    // how to access the board? 
+  getMarker() {
+    return this.marker;
   }
 }
 
 class Human extends Player {
   constructor() {
+    super(Square.HUMAN_MARKER);
 
   }
 }
 
 class Computer extends Player {
   constructor() {
+    super(Square.COMPUTER_MARKER);
 
   }
 }
@@ -80,6 +81,8 @@ class Computer extends Player {
 class TTTGame {
   constructor() {
     this.board = new Board();
+    this.human = new Human();
+    this.computer = new Computer();
   }
 
   displayWelcomeMessage() {
@@ -94,12 +97,26 @@ class TTTGame {
     // shows the results of the game (win, lose, tie).
   }
 
-  firstPlayerMoves() {
-    // the first player makes a move.
+  humanMoves() {
+    let choice;
+
+    while(true) {
+      choice = readline.question("Choose a square between 1 and 9: ");
+      let integerVal = parseInt(choice, 10);
+      if (integerVal >= 1 && integerVal <= 9) {
+        break;
+      }
+
+      console.log("Sorry, that's not a valid choice.");
+      console.log("");
+    }
+
+    this.board.markSquareAt(choice, this.human.getMarker());
   }
 
-  secondPlayerMoves() {
-    // the second player makes a move.
+  computerMoves() {
+    let choice = Math.floor((Math.random() * 9) + 1);
+    this.board.markSquareAt(choice, this.computer.getMarker());
   }
 
   gameOver() {
@@ -112,10 +129,12 @@ class TTTGame {
 
     while (true) {
       this.board.display();
-      this.firstPlayerMoves();
+      this.humanMoves();
+      this.board.display();
       if (this.gameOver()) break;
 
-      this.secondPlayerMoves();
+      this.computerMoves();
+      this.board.display();
       if (this.gameOver()) break;
       break;
     }
