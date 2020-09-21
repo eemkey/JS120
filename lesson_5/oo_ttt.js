@@ -33,7 +33,7 @@ class Board {
       this.squares[String(counter)] = new Square();
     }
   }
-  
+
   markSquareAt(key, marker) {
     this.squares[key].setMarker(marker);
   }
@@ -54,7 +54,14 @@ class Board {
   isFull() {
     return this.unusedSquares().length === 0;
   }
-  
+
+  displayWithClear() {
+    console.clear();
+    console.log("");
+    console.log("");
+    this.display();
+  }
+
   display() {
     console.log("");
     console.log("     |     |");
@@ -115,11 +122,14 @@ class TTTGame {
   ];
 
   displayWelcomeMessage() {
+    console.clear();
     console.log("Welcome to Tic Tac Toe!");
+    console.log("");
   }
 
   displayGoodByeMessage() {
     console.log("Thanks for playing Tic Tac Toe!");
+    console.log("");
   }
 
   displayResults() {
@@ -135,7 +145,7 @@ class TTTGame {
   humanMoves() {
     let choice;
 
-    while(true) {
+    while (true) {
       let validChoices = this.board.unusedSquares();
       const prompt = `Choose a square (${validChoices.join(", ")})`;
       choice = readline.question(prompt);
@@ -175,18 +185,19 @@ class TTTGame {
   }
 
   play() {
-    // orchestrate game play.
     this.displayWelcomeMessage();
-
+    this.board.display();
     while (true) {
-      this.board.display();
       this.humanMoves();
       if (this.gameOver()) break;
 
       this.computerMoves();
       if (this.gameOver()) break;
+
+      this.board.displayWithClear();
     }
 
+    this.board.displayWithClear();
     this.displayResults();
     this.displayGoodByeMessage();
   }
