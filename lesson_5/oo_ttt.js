@@ -110,6 +110,16 @@ class TTTGame {
     this.computer = new Computer();
   }
 
+  static joinOr(choices, firstDelimiter = ", ", optionalLastDelimiter = "or") {
+    let numOfChoices = choices.length;
+    if (numOfChoices <= 2) {
+      return choices.join(optionalLastDelimiter);
+    }
+    let leftSide = choices.slice(0, -1);
+    let lastChoice = choices.slice(-1);
+    return `${leftSide.join(firstDelimiter)}${firstDelimiter}${optionalLastDelimiter} ${lastChoice}`;
+  }
+
   static POSSIBLE_WINNING_ROWS = [
     [ "1", "2", "3" ],
     [ "4", "5", "6" ],
@@ -147,7 +157,7 @@ class TTTGame {
 
     while (true) {
       let validChoices = this.board.unusedSquares();
-      const prompt = `Choose a square (${validChoices.join(", ")})`;
+      const prompt = `Choose a square (${TTTGame.joinOr(validChoices)})`;
       choice = readline.question(prompt);
 
       if (validChoices.includes(choice)) break;
@@ -187,6 +197,7 @@ class TTTGame {
   play() {
     this.displayWelcomeMessage();
     this.board.display();
+
     while (true) {
       this.humanMoves();
       if (this.gameOver()) break;
