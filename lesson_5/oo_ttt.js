@@ -72,12 +72,6 @@ class Board {
   }
 }
 
-class Row {
-  constructor() {
-    // need a way to identify a row of 3 squares.
-  }
-}
-
 class Player {
   constructor(marker) {
     this.marker = marker;
@@ -171,10 +165,7 @@ class TTTGame {
   }
 
   someoneWon() {
-    return TTTGame.POSSIBLE_WINNING_ROWS.some(row => {
-      return this.board.countMarkersFor(this.human, row) === 3 ||
-             this.board.countMarkersFor(this.computer, row) === 3;
-    });
+    return this.isWinner(this.human) || this.isWinner(this.computer);
   }
 
   isWinner(player) {
