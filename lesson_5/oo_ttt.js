@@ -4,6 +4,7 @@ class Square {
   static UNUSED_SQUARE = " ";
   static HUMAN_MARKER = "X";
   static COMPUTER_MARKER = "O";
+  static MIDDLE_SQUARE = "5";
 
   constructor(marker = Square.UNUSED_SQUARE) {
     this.marker = marker;
@@ -27,6 +28,7 @@ class Square {
 }
 
 class Board {
+
   constructor() {
     this.reset();
   }
@@ -178,14 +180,19 @@ class TTTGame {
   }
 
   computerMoves() {
-    let choice = this.defensiveComputerMove();
+    let choice = this.offensiveComputerMove();
 
     if (!choice) {
-      let validChoices = this.board.unusedSquares();
-
-      do {
-        choice = Math.floor((Math.random() * 9) + 1).toString();
-      } while (!validChoices.includes(choice));
+      choice = this.defensiveComputerMove();
+      if (!choice) {
+        choice = this.middleSquare();
+        if (!choice) {
+          let validChoices = this.board.unusedSquares();
+          do {
+            choice = Math.floor((Math.random() * 9) + 1).toString();
+          } while (!validChoices.includes(choice));
+        }
+      }
     }
     this.board.markSquareAt(choice, this.computer.getMarker());
   }
@@ -205,6 +212,21 @@ class TTTGame {
     return null;
   }
 
+  offensiveComputerMove() {
+    let possibleWinningRows = TTTGame.POSSIBLE_WINNING_ROWS.filter(row => {
+      return this.board.countMarkersFor(this.computer, row) === 2;
+    });
+    let choice;
+    for (let row of possibleWinningRows) {
+      let square = this.atRiskSquare(row);
+      if (square) {
+        choice = square;
+        return choice;
+      }
+    }
+    return null;
+  }
+
   atRiskSquare(row) {
     for (let square of row) {
       if (this.board.unusedSquares().includes(square)) {
@@ -214,12 +236,11 @@ class TTTGame {
     return null;
   }
 
-  offensiveMove() {
-
-  }
-
-  pickMiddleSquare() {
-
+  middleSquare() {
+    if (this.board.unusedSquares().includes(Square.MIDDLE_SQUARE)) {
+      return Square.MIDDLE_SQUARE;
+    }
+    return null;
   }
 
   gameOver() {
@@ -247,7 +268,6 @@ class TTTGame {
       if (this.gameOver()) break;
 
       this.board.displayWithClear();
-      console.log(this.defensiveComputerMove());
     }
 
     this.board.displayWithClear();
