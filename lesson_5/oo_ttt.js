@@ -184,16 +184,16 @@ class TTTGame {
 
     if (!choice) {
       choice = this.defensiveComputerMove();
-      if (!choice) {
-        choice = this.middleSquare();
-        if (!choice) {
-          let validChoices = this.board.unusedSquares();
-          do {
-            choice = Math.floor((Math.random() * 9) + 1).toString();
-          } while (!validChoices.includes(choice));
-        }
-      }
     }
+
+    if (!choice) {
+      choice = this.pickMiddleSquare();
+    }
+
+    if (!choice) {
+      choice = this.pickRandomSquare();
+    }
+
     this.board.markSquareAt(choice, this.computer.getMarker());
   }
 
@@ -236,11 +236,20 @@ class TTTGame {
     return null;
   }
 
-  middleSquare() {
+  pickMiddleSquare() {
     if (this.board.unusedSquares().includes(Square.MIDDLE_SQUARE)) {
       return Square.MIDDLE_SQUARE;
     }
     return null;
+  }
+
+  pickRandomSquare() {
+    let choice;
+    let validChoices = this.board.unusedSquares();
+    do {
+      choice = Math.floor((Math.random() * 9) + 1).toString();
+    } while (!validChoices.includes(choice));
+    return choice;
   }
 
   gameOver() {
