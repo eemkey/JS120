@@ -198,23 +198,16 @@ class TTTGame {
   }
 
   defensiveComputerMove() {
-    let dangerRows = TTTGame.POSSIBLE_WINNING_ROWS.filter(row => {
-      return this.board.countMarkersFor(this.human, row) === 2;
-    });
-    let choice;
-    for (let row of dangerRows) {
-      let square = this.atRiskSquare(row);
-      if (square) {
-        choice = square;
-        return choice;
-      }
-    }
-    return null;
+    return this.findAtRiskSquare(this.human);
   }
 
   offensiveComputerMove() {
+    return this.findAtRiskSquare(this.computer);
+  }
+
+  findAtRiskSquare(player) {
     let possibleWinningRows = TTTGame.POSSIBLE_WINNING_ROWS.filter(row => {
-      return this.board.countMarkersFor(this.computer, row) === 2;
+      return this.board.countMarkersFor(player, row) === 2;
     });
     let choice;
     for (let row of possibleWinningRows) {
