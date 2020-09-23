@@ -55,7 +55,7 @@ class Board {
 
   countMarkersFor(player, keys) {
     let markers = keys.filter(key => {
-      return this.squares[key].getMarker() === player.marker;
+      return this.squares[key].getMarker() === player.getMarker();
     });
 
     return markers.length;
@@ -67,6 +67,7 @@ class Board {
 
   displayWithClear() {
     console.clear();
+    console.log("");
     console.log("");
     console.log("");
     this.display();
@@ -92,10 +93,19 @@ class Board {
 class Player {
   constructor(marker) {
     this.marker = marker;
+    this.score = 0;
   }
 
   getMarker() {
     return this.marker;
+  }
+
+  getScore() {
+    return this.score;
+  }
+
+  incrementScore() {
+    this.score += 1;
   }
 }
 
@@ -119,6 +129,8 @@ class TTTGame {
     this.human = new Human();
     this.computer = new Computer();
   }
+
+  static MATCH_GAMES = 3;
 
   static joinOr(choices, firstDelimiter = ", ", optionalLastDelimiter = "or") {
     let numOfChoices = choices.length;
@@ -154,9 +166,9 @@ class TTTGame {
 
   displayResults() {
     if (this.isWinner(this.human)) {
-      console.log("You won! Congratulations!");
+      console.log("You win!");
     } else if (this.isWinner(this.computer)) {
-      console.log("Computer won! Better luck next time!");
+      console.log("Computer wins.");
     } else {
       console.log("A tie game.");
     }
@@ -259,9 +271,37 @@ class TTTGame {
     });
   }
 
+  updateMatchScore() {
+    if (this.isWinner(this.human)) {
+      this.human.incrementScore();
+    } else if (this.isWinner(this.computer)) {
+      this.computer.incrementScore();
+    }
+  }
+
+  displayMatchScore() {
+    console.log(`Player: ${this.human.getScore()} Computer: ${this.computer.getScore()}`);
+    console.log("");
+  }
+
+  matchOver() {
+    return this.human.getScore() === 3 || this.computer.getScore() === 3;
+  }
+
+  displayMatchResults() {
+    if (this.human.getScore() === 3) {
+      console.log("You won the match! Congratulations!");
+    } else if (this.computer.getScore() === 3) {
+      console.log("Computer won the match. Better luck next time!");
+    } else {
+      console.log("No one won the match.");
+    }
+  }
+
   playOneGame() {
     this.board.reset();
     this.board.display();
+    this.displayMatchScore();
     while (true) {
       this.humanMoves();
       if (this.gameOver()) break;
@@ -270,6 +310,7 @@ class TTTGame {
       if (this.gameOver()) break;
 
       this.board.displayWithClear();
+      this.displayMatchScore();
     }
 
     this.board.displayWithClear();
@@ -285,17 +326,24 @@ class TTTGame {
       console.log("Invalid answer. Please choose 'y' or 'n'.");
     }
     console.clear();
-    return answer;
+    return answer === "y";
+  }
+
+  playMatch() {
+    console.log(`First player to win ${TTTGame.MATCH_GAMES} games wins the match.`);
+    while (true) {
+      this.playOneGame();
+      this.updateMatchScore();
+      this.displayMatchScore();
+      if (this.matchOver()) break;
+      if (!this.playAgain()) break;
+    }
+    this.displayMatchResults();
   }
 
   play() {
     this.displayWelcomeMessage();
-
-    while (true) {
-      this.playOneGame();
-      if (this.playAgain() !== "y") break;
-    }
-
+    this.playMatch();
     this.displayGoodByeMessage();
   }
 }
