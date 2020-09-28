@@ -62,16 +62,20 @@ class Card {
 
 class Deck {
   constructor() {
+    this.makeNewShuffledDeck();
+  }
+
+  makeNewShuffledDeck() {
     this.deck = [];
     for (let suit of Card.SUITS) {
       for (let rank of Card.RANKS) {
-        this.cards.push(new Card(suit, rank));
+        this.deck.push(new Card(suit, rank));
       }
     }
-    this.shuffleCards();
+    this.shuffleDeck();
   }
 
-  shuffleCards() {
+  shuffleDeck() {
     shuffle(this.deck);
   }
 
@@ -82,79 +86,91 @@ class Deck {
   }
 
   dealCardFaceUp() {
-    return this.deck.pop();
+    if (this.deck.length > 0) {
+      return this.deck.pop();
+    } else {
+      this.makeNewShuffledDeck();
+      return this.deck.pop();
+    }
   }
 }
 
-class Participant {
+let Hand = {
+  resetHand() {
+    this.hand = [];
+  },
+
+  addCard(card) {
+    this.hand.push(card);
+  },
+
+  showHand() {
+    for (let card of this.hand) {
+      console.log(`${card}`)
+    }
+  },
+
+  getHand() {
+    return this.hand;
+  },
+
+  revealHand() {
+    for (let card of this.hand) {
+      card.reveal();
+    }
+  }
+};
+
+class Player {
+  static STARTING_MONEY = 5;
+  static MONEY_GOAL = 10;
+
   constructor() {
-    // what state?
+    this.money = Player.STARTING_MONEY;
+    this.resetHand();
+  }
 
+  winBet() {
+    this.money += 1;
+  }
+
+  loseBet() {
+    this.money -= 1;
+  }
+
+  isBroke() {
+    return this.money <= 0;
+  }
+
+  isRich() {
+    return this.money >= Player.MONEY_GOAL;
+  }
+
+  showCurrentMoney() {
+    console.log(`$${this.money}`)
   }
 }
 
-class Player extends Participant {
+class Dealer {
   constructor() {
-
-  }
-
-  hit() {
-
-  }
-
-  stay() {
-
-  }
-
-  isBusted() {
-
-  }
-
-  score() {
-
+    this.resetHand();
   }
 }
 
-class Dealer extends Participant {
-  constructor() {
-
-  }
-
-  hit() {
-
-  }
-
-  stay() {
-
-  }
-
-  isBusted() {
-
-  }
-
-  score() {
-
-  }
-
-  hide() {
-
-  }
-
-  reveal() {
-
-  }
-
-  deal() {
-
-  }
-}
+Object.assign(Player.prototype, Hand);
+Object.assign(Dealer.prototype, Hand);
 
 class TwentyOneGame {
-  constructor() {
+  static TARGET_SCORE = 21;
+  static DEALER_STAY_SCORE = 17;
 
+  constructor() {
+    this.deck = new Deck();
+    this.player = new Player();
+    this.dealer = new Dealer();
   }
 
-  start() {
+  play() {
     this.displayWelcomeMessage();
     this.dealCards();
     this.showCards();
@@ -169,7 +185,7 @@ class TwentyOneGame {
   }
 
   dealCards() {
-
+  
   }
 
   showCards() {
@@ -194,6 +210,6 @@ class TwentyOneGame {
 }
 
 let game = new TwentyOneGame();
-game.start();
+game.play();
 
 
