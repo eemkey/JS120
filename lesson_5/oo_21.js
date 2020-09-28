@@ -62,15 +62,27 @@ class Card {
 
 class Deck {
   constructor() {
-    this.cards = [];
-
-    // what state the deck needs
-    // 52 cards
-    // data structure to keep tract of the cards (array, object)
+    this.deck = [];
+    for (let suit of Card.SUITS) {
+      for (let rank of Card.RANKS) {
+        this.cards.push(new Card(suit, rank));
+      }
+    }
+    this.shuffleCards();
   }
 
-  deal() {
+  shuffleCards() {
+    shuffle(this.deck);
+  }
 
+  dealCardFaceDown() {
+    let card = this.dealCardFaceUp();
+    card.hide();
+    return card;
+  }
+
+  dealCardFaceUp() {
+    return this.deck.pop();
   }
 }
 
