@@ -19,9 +19,9 @@ class Card {
     return this.rank;
   }
 
-  getCardVal() {
-    if (isHidden()) {
-      return "Hidden";
+  toString() {
+    if (this.isHidden()) {
+      return "??";
     } else {
       return `${this.getRank()}${this.getSuit()}`
     }
@@ -32,19 +32,19 @@ class Card {
   }
 
   isAce() {
-    return this.getSuit() === "A";
+    return this.getRank() === "A";
   }
 
   isJack() {
-    return this.getSuit() === "J";
+    return this.getRank() === "J";
   }
 
   isQueen() {
-    return this.getSuit() === "Q";
+    return this.getRank() === "Q";
   }
 
   isKing() {
-    return this.getSuit() === "K";
+    return this.getRank() === "K";
   }
 
   isFaceCard() {
@@ -100,11 +100,13 @@ let Hand = {
     this.hand = [];
   },
 
-  addCard(card) {
+  addToHand(card) {
     this.hand.push(card);
   },
 
-  showHand() {
+  showHand(caption) {
+    console.log(caption);
+
     for (let card of this.hand) {
       console.log(`${card}`)
     }
@@ -127,6 +129,7 @@ class Player {
 
   constructor() {
     this.money = Player.STARTING_MONEY;
+    this.name = "Player";
     this.resetHand();
   }
 
@@ -154,6 +157,7 @@ class Player {
 class Dealer {
   constructor() {
     this.resetHand();
+    this.name = "Dealer";
   }
 }
 
@@ -165,19 +169,9 @@ class TwentyOneGame {
   static DEALER_STAY_SCORE = 17;
 
   constructor() {
-    this.deck = new Deck();
     this.player = new Player();
     this.dealer = new Dealer();
-  }
-
-  play() {
-    this.displayWelcomeMessage();
-    this.dealCards();
-    this.showCards();
-    this.playerTurn();
-    this.dealerTurn();
-    this.displayResult();
-    this.displayGoodbyeMessage();
+    this.deck = new Deck();
   }
 
   displayWelcomeMessage() {
@@ -185,11 +179,52 @@ class TwentyOneGame {
   }
 
   dealCards() {
-  
+    this.player.resetHand();
+    this.dealer.resetHand();
+
+    this.player.addToHand(this.deck.dealCardFaceUp());
+    this.dealer.addToHand(this.deck.dealCardFaceUp());
+    this.player.addToHand(this.deck.dealCardFaceUp());
+    this.dealer.addToHand(this.deck.dealCardFaceDown());
+
   }
 
   showCards() {
+    this.player.showHand("Player's Hand");
+    this.showScore(this.player);
 
+    this.dealer.showHand("Dealer's Hand");
+    this.showScore(this.dealer);
+  }
+
+  showScore(participant) {
+    console.log(`${participant.name}'s score: ${this.calculateScore(participant)}`)
+  }
+
+  calculateScore(hand) {
+    let cards = hand.getHand();
+    console.log(`cards: ${cards}`);
+    let score = cards.reduce((total, card) => {
+      return total + this.getValueOf(card);
+    }, 0);
+
+    if (cards.filter(card => card.isAce()).length > 0 && score > TwentyOneGame.TARGET_SCORE) {
+      score -= 10;
+    }
+    
+    return score;
+  }
+
+  getValueOf(card) {
+    if (card.isHidden()) {
+      return 0;
+    } else if (card.isAce()) {
+      return 11;
+    } else if (card.isFaceCard()) {
+      return 10;
+    } else {
+      return parseInt(card.getRank(), 10);
+    }
   }
 
   playerTurn() {
@@ -206,6 +241,23 @@ class TwentyOneGame {
 
   displayGoodbyeMessage() {
     console.log("Thanks for playing 21. Goodbye!");
+  }
+
+  playOneGame() {
+    this.dealCards();
+    this.showCards();
+    this.playerTurn();
+    this.dealerTurn();
+    this.displayResult();
+  }
+
+  play() {
+    this.displayWelcomeMessage();
+    // while (true) {
+      this.playOneGame();
+    //   if (this.player.isBroke() || this.player.isRich()) break;
+    // }
+    this.displayGoodbyeMessage();
   }
 }
 
