@@ -176,6 +176,7 @@ class Game {
   }
 
   displayWelcomeMessage() {
+    console.clear();
     console.log("Welcome to 21!");
     console.log("");
     console.log("");
@@ -189,6 +190,16 @@ class Game {
   displayMoney() {
     console.log(`Player has $${this.player.getMoney()}.`);
     console.log("");
+  }
+
+  displayBrokeOrRich() {
+    if (this.player.isBroke()) {
+      console.log("You're broke!");
+    }
+
+    if (this.player.isRich()) {
+      console.log("You're rich!");
+    }
   }
 
   displayScore(participant) {
@@ -358,7 +369,6 @@ class Game {
   }
 
   play() {
-    console.clear();
     this.displayWelcomeMessage();
     while (true) {
       this.playOneGame();
@@ -369,13 +379,7 @@ class Game {
       if (this.playAgain() !== "y") break;
       console.clear();
     }
-    if (this.player.isBroke()) {
-      console.log("You're broke!");
-    }
-
-    if (this.player.isRich()) {
-      console.log("You're rich!");
-    }
+    this.displayBrokeOrRich();
     this.displayGoodbyeMessage();
   }
 }
