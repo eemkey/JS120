@@ -149,8 +149,8 @@ class Player {
     return this.money >= Player.MONEY_GOAL;
   }
 
-  showCurrentMoney() {
-    console.log(`$${this.money}`)
+  getMoney() {
+    return this.money;
   }
 }
 
@@ -174,8 +174,37 @@ class TwentyOneGame {
     this.deck = new Deck();
   }
 
-  displayWelcomeMessage() {
+  displayWelcomeMessage(){
     console.log("Welcome to 21!");
+    console.log("");
+  }
+
+  displayGoodbyeMessage() {
+    console.log("Thanks for playing 21. Goodbye!");
+  }
+
+  displayMoney() {
+    console.log("");
+    console.log(`Player has $${this.player.getMoney()}`);
+    console.log("");
+  }
+
+  displayScore(participant) {
+    console.log(`${participant.name}'s score: ${this.calculateScore(participant)}`)
+  }
+
+  displayCards() {
+    this.dealer.showHand("-Dealer's Hand-");
+    this.displayScore(this.dealer);
+    console.log("");
+    this.player.showHand("-Player's Hand-");
+    this.displayScore(this.player);
+  }
+
+  clearAndDisplayStats() {
+    console.clear();
+    this.displayCards();
+    this.displayMoney();
   }
 
   dealCards() {
@@ -189,29 +218,17 @@ class TwentyOneGame {
 
   }
 
-  showCards() {
-    this.player.showHand("Player's Hand");
-    this.showScore(this.player);
-
-    this.dealer.showHand("Dealer's Hand");
-    this.showScore(this.dealer);
-  }
-
-  showScore(participant) {
-    console.log(`${participant.name}'s score: ${this.calculateScore(participant)}`)
-  }
-
   calculateScore(hand) {
     let cards = hand.getHand();
-    console.log(`cards: ${cards}`);
     let score = cards.reduce((total, card) => {
       return total + this.getValueOf(card);
     }, 0);
 
-    if (cards.filter(card => card.isAce()).length > 0 && score > TwentyOneGame.TARGET_SCORE) {
+    let numOfAces = cards.filter(card => card.isAce()).length;
+    if (numOfAces > 0 && score > TwentyOneGame.TARGET_SCORE) {
       score -= 10;
     }
-    
+
     return score;
   }
 
@@ -227,35 +244,99 @@ class TwentyOneGame {
     }
   }
 
-  playerTurn() {
+  hit(hand) {
+    hand.addToHand(this.deck.dealCardFaceUp());
+  }
 
+  isBust(hand) {
+    return this.calculateScore(hand) > TwentyOneGame.TARGET_SCORE;
+  }
+
+  hitOrStay() {
+    let answer;
+
+    while (true) {
+      answer = readline.question("Do you want to hit(h) or stay(s)?").toLowerCase();
+      if (["s", "h"].includes(answer)) break;
+      console.log("Sorry that is not a valid choice.");
+    }
+    return answer;
+  }
+
+  playerTurn() {
+    while (true) {
+      if (this.hitOrStay() === "h") {
+        this.hit(this.player);
+        this.clearAndDisplayStats();
+      } else {
+        break;
+      }
+      if (this.isBust(this.player) || this.calculateScore(this.player) === TwentyOneGame.TARGET_SCORE) {
+        break;
+      }
+    }
   }
 
   dealerTurn() {
-
+    this.dealer.revealHand();
+    this.clearAndDisplayStats();
+    if (!this.isBust(this.player)) {
+      while (true) {
+        let score = this.calculateScore(this.dealer);
+        if (score < TwentyOneGame.DEALER_STAY_SCORE) {
+          this.hit(this.dealer);
+          this.clearAndDisplayStats();
+        } else {
+          break;
+        }
+        if (this.isBust(this.dealer)) {
+          break;
+        }
+      }
+    }
   }
 
-  displayResult() {
-
+  isWinner() {
+    let playerScore = this.calculateScore(this.player);
+    let dealerScore = this.calculateScore(this.dealer);
+    
+    if (!this.isBust(this.player) &&
+      (playerScore > dealerScore) ||
+      this.isBust(this.dealer)) {
+        return this.player;
+    } else if (!this.isBust(this.dealer) &&
+      (dealerScore > playerScore) ||
+      this.isBust(this.player)) {
+        return this.dealer;
+    } else {
+      return null;
+    }
   }
 
-  displayGoodbyeMessage() {
-    console.log("Thanks for playing 21. Goodbye!");
+  updateMoney() {
+    if (this.isWinner() === this.player) {
+      this.player.winBet();
+    } else if (this.isWinner() === this.dealer) {
+      this.player.loseBet();
+    }
   }
 
   playOneGame() {
     this.dealCards();
-    this.showCards();
+    this.displayCards();
+    this.displayMoney();
     this.playerTurn();
     this.dealerTurn();
-    this.displayResult();
   }
 
   play() {
+    console.clear();
     this.displayWelcomeMessage();
     // while (true) {
       this.playOneGame();
-    //   if (this.player.isBroke() || this.player.isRich()) break;
+      this.updateMoney();
+      this.clearAndDisplayStats();
+      // if (this.player.isBroke() || this.player.isRich()) break;
     // }
     this.displayGoodbyeMessage();
   }
