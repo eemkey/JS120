@@ -9,7 +9,8 @@ class Card {
   }
 
   static SUITS = ["♥", "♠", "♦", "♣"];
-  static RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+  static RANKS = ["2", "3", "4", "5", "6", "7",
+    "8", "9", "10", "J", "Q", "K", "A"];
 
   getSuit() {
     return this.suit;
@@ -23,7 +24,7 @@ class Card {
     if (this.isHidden()) {
       return "??";
     } else {
-      return `${this.getRank()}${this.getSuit()}`
+      return `${this.getRank()}${this.getSuit()}`;
     }
   }
 
@@ -108,7 +109,7 @@ let Hand = {
     console.log(caption);
 
     for (let card of this.hand) {
-      console.log(`${card}`)
+      console.log(`${card}`);
     }
   },
 
@@ -164,7 +165,7 @@ class Dealer {
 Object.assign(Player.prototype, Hand);
 Object.assign(Dealer.prototype, Hand);
 
-class TwentyOneGame {
+class Game {
   static TARGET_SCORE = 21;
   static DEALER_STAY_SCORE = 17;
 
@@ -174,7 +175,7 @@ class TwentyOneGame {
     this.deck = new Deck();
   }
 
-  displayWelcomeMessage(){
+  displayWelcomeMessage() {
     console.log("Welcome to 21!");
     console.log("");
     console.log("");
@@ -191,7 +192,7 @@ class TwentyOneGame {
   }
 
   displayScore(participant) {
-    console.log(`${participant.name}'s score: ${this.calculateScore(participant)}`)
+    console.log(`${participant.name}'s score: ${this.calculateScore(participant)}`);
   }
 
   displayCards() {
@@ -235,7 +236,7 @@ class TwentyOneGame {
     }, 0);
 
     let numOfAces = cards.filter(card => card.isAce()).length;
-    if (numOfAces > 0 && score > TwentyOneGame.TARGET_SCORE) {
+    if (numOfAces > 0 && score > Game.TARGET_SCORE) {
       score -= 10;
     }
 
@@ -269,7 +270,7 @@ class TwentyOneGame {
   }
 
   isBust(hand) {
-    return this.calculateScore(hand) > TwentyOneGame.TARGET_SCORE;
+    return this.calculateScore(hand) > Game.TARGET_SCORE;
   }
 
   hitOrStay() {
@@ -277,7 +278,8 @@ class TwentyOneGame {
     let answer;
 
     while (true) {
-      answer = readline.question("Do you want to hit(h) or stay(s)?").toLowerCase();
+      let prompt = "Do you want to hit(h) or stay(s)?";
+      answer = readline.question(prompt).toLowerCase();
       if (["s", "h"].includes(answer)) break;
       console.log("Sorry that is not a valid choice.");
     }
@@ -297,14 +299,15 @@ class TwentyOneGame {
 
   playerTurn() {
     while (true) {
-      if (this.calculateScore(this.player) === TwentyOneGame.TARGET_SCORE) break;
+      if (this.calculateScore(this.player) === Game.TARGET_SCORE) break;
       if (this.hitOrStay() === "h") {
         this.hit(this.player);
         this.clearAndDisplayStats();
       } else {
         break;
       }
-      if (this.isBust(this.player) || this.calculateScore(this.player) === TwentyOneGame.TARGET_SCORE) {
+      if (this.isBust(this.player) ||
+      this.calculateScore(this.player) === Game.TARGET_SCORE) {
         break;
       }
     }
@@ -316,7 +319,7 @@ class TwentyOneGame {
     if (!this.isBust(this.player)) {
       while (true) {
         let score = this.calculateScore(this.dealer);
-        if (score < TwentyOneGame.DEALER_STAY_SCORE) {
+        if (score < Game.DEALER_STAY_SCORE) {
           this.hit(this.dealer);
           this.clearAndDisplayStats();
         } else {
@@ -332,15 +335,15 @@ class TwentyOneGame {
   isWinner() {
     let playerScore = this.calculateScore(this.player);
     let dealerScore = this.calculateScore(this.dealer);
-    
+
     if (!this.isBust(this.player) &&
-      (playerScore > dealerScore) ||
-      this.isBust(this.dealer)) {
-        return this.player;
+      ((playerScore > dealerScore) ||
+      this.isBust(this.dealer))) {
+      return this.player;
     } else if (!this.isBust(this.dealer) &&
-      (dealerScore > playerScore) ||
-      this.isBust(this.player)) {
-        return this.dealer;
+      ((dealerScore > playerScore) ||
+      this.isBust(this.player))) {
+      return this.dealer;
     } else {
       return null;
     }
@@ -377,7 +380,7 @@ class TwentyOneGame {
   }
 }
 
-let game = new TwentyOneGame();
+let game = new Game();
 game.play();
 
 
