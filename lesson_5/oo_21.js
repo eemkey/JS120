@@ -20,14 +20,6 @@ class Card {
     return this.rank;
   }
 
-  toString() {
-    if (this.isHidden()) {
-      return "??";
-    } else {
-      return `${this.getRank()}${this.getSuit()}`;
-    }
-  }
-
   isHidden() {
     return this.hidden;
   }
@@ -58,6 +50,14 @@ class Card {
 
   reveal() {
     this.hidden = false;
+  }
+
+  toString() {
+    if (this.isHidden()) {
+      return "??";
+    } else {
+      return `${this.getRank()}${this.getSuit()}`;
+    }
   }
 }
 
@@ -157,8 +157,8 @@ class Player {
 
 class Dealer {
   constructor() {
-    this.resetHand();
     this.name = "Dealer";
+    this.resetHand();
   }
 }
 
@@ -177,7 +177,10 @@ class Game {
 
   displayWelcomeMessage() {
     console.clear();
-    console.log("Welcome to 21!");
+    console.log(`* Welcome to ${Game.TARGET_SCORE}!`);
+    console.log(`* Your goal is to reach ${Game.TARGET_SCORE} without going over.`);
+    console.log(`* You start with $${Player.STARTING_MONEY}. For every win, you get $1. For every loss, you lose $1.`);
+    console.log(`* The game ends when you're broke ($0) or when you're rich ($${Player.MONEY_GOAL}).`);
     console.log("");
     console.log("");
   }
@@ -242,15 +245,16 @@ class Game {
 
   calculateScore(hand) {
     let cards = hand.getHand();
-    let score = cards.reduce((total, card) => {
-      return total + this.getValueOf(card);
-    }, 0);
+    let score = cards.reduce((total, card) => total + this.getValueOf(card), 0);
+    return this.adjustScoreForAces(cards, score);
+  }
 
-    let numOfAces = cards.filter(card => card.isAce()).length;
-    if (numOfAces > 0 && score > Game.TARGET_SCORE) {
-      score -= 10;
-    }
-
+  adjustScoreForAces(cards, score) {
+    cards.filter(card => card.isAce()).forEach(() => {
+      if (score > Game.TARGET_SCORE) {
+        score -= 10;
+      }
+    });
     return score;
   }
 
@@ -386,5 +390,3 @@ class Game {
 
 let game = new Game();
 game.play();
-
-
