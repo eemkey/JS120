@@ -177,15 +177,16 @@ class TwentyOneGame {
   displayWelcomeMessage(){
     console.log("Welcome to 21!");
     console.log("");
+    console.log("");
   }
 
   displayGoodbyeMessage() {
+    console.log("");
     console.log("Thanks for playing 21. Goodbye!");
   }
 
   displayMoney() {
-    console.log("");
-    console.log(`Player has $${this.player.getMoney()}`);
+    console.log(`Player has $${this.player.getMoney()}.`);
     console.log("");
   }
 
@@ -197,8 +198,20 @@ class TwentyOneGame {
     this.dealer.showHand("-Dealer's Hand-");
     this.displayScore(this.dealer);
     console.log("");
+    console.log("");
     this.player.showHand("-Player's Hand-");
     this.displayScore(this.player);
+  }
+
+  displayWinner() {
+    if (this.isWinner() === this.player) {
+      console.log("Congrats, you win!");
+    } else if (this.isWinner() === this.dealer) {
+      console.log("Sorry, dealer wins.");
+    } else {
+      console.log("It's a tie.");
+    }
+    console.log("");
   }
 
   clearAndDisplayStats() {
@@ -207,15 +220,12 @@ class TwentyOneGame {
     this.displayMoney();
   }
 
-  dealCards() {
-    this.player.resetHand();
-    this.dealer.resetHand();
-
-    this.player.addToHand(this.deck.dealCardFaceUp());
-    this.dealer.addToHand(this.deck.dealCardFaceUp());
-    this.player.addToHand(this.deck.dealCardFaceUp());
-    this.dealer.addToHand(this.deck.dealCardFaceDown());
-
+  updateMoney() {
+    if (this.isWinner() === this.player) {
+      this.player.winBet();
+    } else if (this.isWinner() === this.dealer) {
+      this.player.loseBet();
+    }
   }
 
   calculateScore(hand) {
@@ -244,6 +254,16 @@ class TwentyOneGame {
     }
   }
 
+  dealCards() {
+    this.player.resetHand();
+    this.dealer.resetHand();
+
+    this.player.addToHand(this.deck.dealCardFaceUp());
+    this.dealer.addToHand(this.deck.dealCardFaceUp());
+    this.player.addToHand(this.deck.dealCardFaceUp());
+    this.dealer.addToHand(this.deck.dealCardFaceDown());
+  }
+
   hit(hand) {
     hand.addToHand(this.deck.dealCardFaceUp());
   }
@@ -253,6 +273,7 @@ class TwentyOneGame {
   }
 
   hitOrStay() {
+    console.log("");
     let answer;
 
     while (true) {
@@ -263,8 +284,20 @@ class TwentyOneGame {
     return answer;
   }
 
+  playAgain() {
+    console.log("");
+    let answer;
+    while (true) {
+      answer = readline.question("Play again? (y/n)").toLowerCase();
+      if (["y", "n"].includes(answer)) break;
+      console.log("Invalid answer.");
+    }
+    return answer;
+  }
+
   playerTurn() {
     while (true) {
+      if (this.calculateScore(this.player) === TwentyOneGame.TARGET_SCORE) break;
       if (this.hitOrStay() === "h") {
         this.hit(this.player);
         this.clearAndDisplayStats();
@@ -313,14 +346,6 @@ class TwentyOneGame {
     }
   }
 
-  updateMoney() {
-    if (this.isWinner() === this.player) {
-      this.player.winBet();
-    } else if (this.isWinner() === this.dealer) {
-      this.player.loseBet();
-    }
-  }
-
   playOneGame() {
     this.dealCards();
     this.displayCards();
@@ -332,12 +357,22 @@ class TwentyOneGame {
   play() {
     console.clear();
     this.displayWelcomeMessage();
-    // while (true) {
+    while (true) {
       this.playOneGame();
       this.updateMoney();
       this.clearAndDisplayStats();
-      // if (this.player.isBroke() || this.player.isRich()) break;
-    // }
+      this.displayWinner();
+      if (this.player.isBroke() || this.player.isRich()) break;
+      if (this.playAgain() !== "y") break;
+      console.clear();
+    }
+    if (this.player.isBroke()) {
+      console.log("You're broke!");
+    }
+
+    if (this.player.isRich()) {
+      console.log("You're rich!");
+    }
     this.displayGoodbyeMessage();
   }
 }
