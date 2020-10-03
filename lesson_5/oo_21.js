@@ -129,7 +129,7 @@ class Player {
   static MONEY_GOAL = 10;
 
   constructor() {
-    this.money = Player.STARTING_MONEY;
+    this.resetMoney();
     this.name = "Player";
     this.resetHand();
   }
@@ -152,6 +152,10 @@ class Player {
 
   getMoney() {
     return this.money;
+  }
+
+  resetMoney() {
+    this.money = Player.STARTING_MONEY;
   }
 }
 
@@ -219,9 +223,9 @@ class Game {
   }
 
   displayWinner() {
-    if (this.isWinner() === this.player) {
+    if (this.getWinner() === this.player) {
       console.log("Congrats, you win!");
-    } else if (this.isWinner() === this.dealer) {
+    } else if (this.getWinner() === this.dealer) {
       console.log("Sorry, dealer wins.");
     } else {
       console.log("It's a tie.");
@@ -236,9 +240,9 @@ class Game {
   }
 
   updateMoney() {
-    if (this.isWinner() === this.player) {
+    if (this.getWinner() === this.player) {
       this.player.winBet();
-    } else if (this.isWinner() === this.dealer) {
+    } else if (this.getWinner() === this.dealer) {
       this.player.loseBet();
     }
   }
@@ -293,7 +297,7 @@ class Game {
     let answer;
 
     while (true) {
-      let prompt = "Do you want to hit(h) or stay(s)?";
+      let prompt = "Do you want to hit(h) or stay(s)? ";
       answer = readline.question(prompt).toLowerCase();
       if (["s", "h"].includes(answer)) break;
       console.log("Sorry that is not a valid choice.");
@@ -305,7 +309,7 @@ class Game {
     console.log("");
     let answer;
     while (true) {
-      answer = readline.question("Play again? (y/n)").toLowerCase();
+      answer = readline.question("Play again? (y/n) ").toLowerCase();
       if (["y", "n"].includes(answer)) break;
       console.log("Invalid answer.");
     }
@@ -314,15 +318,12 @@ class Game {
 
   playerTurn() {
     while (true) {
-      if (this.calculateScore(this.player) === Game.TARGET_SCORE) break;
+      if (this.isBust(this.player) ||
+        this.calculateScore(this.player) === Game.TARGET_SCORE) break;
       if (this.hitOrStay() === "h") {
         this.hit(this.player);
         this.clearAndDisplayStats();
       } else {
-        break;
-      }
-      if (this.isBust(this.player) ||
-      this.calculateScore(this.player) === Game.TARGET_SCORE) {
         break;
       }
     }
@@ -347,7 +348,7 @@ class Game {
     }
   }
 
-  isWinner() {
+  getWinner() {
     let playerScore = this.calculateScore(this.player);
     let dealerScore = this.calculateScore(this.dealer);
 
@@ -364,7 +365,7 @@ class Game {
     }
   }
 
-  playOneGame() {
+  playOneRound() {
     this.dealCards();
     this.displayCards();
     this.displayMoney();
@@ -373,17 +374,24 @@ class Game {
   }
 
   play() {
-    this.displayWelcomeMessage();
     while (true) {
-      this.playOneGame();
-      this.updateMoney();
-      this.clearAndDisplayStats();
-      this.displayWinner();
-      if (this.player.isBroke() || this.player.isRich()) break;
-      if (this.playAgain() !== "y") break;
+      this.player.resetMoney();
       console.clear();
+      this.displayWelcomeMessage();
+
+      while (true) {
+        this.playOneRound();
+        this.updateMoney();
+        this.clearAndDisplayStats();
+        this.displayWinner();
+        if (this.player.isBroke() || this.player.isRich()) break;
+        if (this.playAgain() !== "y") break;
+        console.clear();
+      }
+
+      this.displayBrokeOrRich();
+      if (this.playAgain() !== "y") break;
     }
-    this.displayBrokeOrRich();
     this.displayGoodbyeMessage();
   }
 }
