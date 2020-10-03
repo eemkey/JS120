@@ -50,9 +50,47 @@ function createComputer() {
   let playerObj = createPlayer();
 
   let computerObj = {
+    wins: {rock: 0, paper: 0, scissors: 0, lizard: 0, spock: 0},
+    losses : {rock: 0, paper: 0, scissors: 0, lizard: 0, spock: 0},
+    weights: {rock: 20, paper: 20, scissors: 20, lizard: 20, spock: 20 },
+
+    calculateWeights() {
+      let totalWins = Object.values(this.wins).reduce((acc, curr) => acc + curr, 0);
+      let totalLosses = Object.values(this.losses).reduce((acc, curr) => acc + curr, 0);
+
+      let totalGames = totalWins + totalLosses;
+      for (let move in this.losses) {
+        let moveLoseRate = this.losses[move] / totalGames;
+        if (moveLoseRate > 0.6) {
+          this.weights[move] -= 4;
+
+          for (let otherMove in this.weights) {
+            if (otherMove !== move) {
+              this.weights[otherMove] += 1;
+            }
+          }
+
+        } else if (moveLoseRate < 0.6 && moveLoseRate > 0) {
+          this.weights[move] += 4;
+          for (let otherMove in this.weights) {
+            if (otherMove !== move) {
+              this.weights[otherMove] -= 1;
+            }
+          }
+        }
+      }
+    },
+
     choose() {
-      const choices = Object.keys(VALID_CHOICES);
+      const choices = [];
+      for (let choice in this.weights) {
+        for (let index = 0; index < this.weights[choice]; index++) {
+          choices.push(choice);
+        }
+      }
       let randomIdx = Math.floor(Math.random() * choices.length);
+
+
       this.move = choices[randomIdx];
       this.movesHistory.unshift(this.move);
     }
@@ -67,9 +105,6 @@ function createScoreBoard() {
   };
 }
 
-// function createRule() {
-//   // possible state? not clear whether Rules need state
-// }
 
 const RPSGame = {
 
@@ -139,6 +174,14 @@ const RPSGame = {
     }
   },
 
+  updateComputerWinsOrLosses(humanMove, computerMove) {
+    if (this.isWinner(humanMove, computerMove)) {
+      this.computer.losses[computerMove] += 1;
+    } else if (this.isWinner(computerMove, humanMove)) {
+      this.computer.wins[computerMove] += 1;
+    }
+  },
+
   isWinner(player1, player2) {
     return this.WINNING_COMBOS[player1].includes(player2);
   },
@@ -191,6 +234,8 @@ const RPSGame = {
     console.clear();
     let outcome = this.determineRoundWinner(human.move, computer.move);
     this.updateScoreBoard(outcome);
+    this.updateComputerWinsOrLosses(human.move, computer.move);
+    computer.calculateWeights();
     this.displayPickedChoices(human.move, computer.move);
     this.displayRoundWinner(outcome);
     this.displayCurrentScore(this.scoreBoard);
