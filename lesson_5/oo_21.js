@@ -178,7 +178,7 @@ class Game {
   displayWelcomeMessage() {
     console.clear();
     console.log(`* Welcome to ${Game.TARGET_SCORE}!`);
-    console.log(`* Your goal is to reach ${Game.TARGET_SCORE} without going over.`);
+    console.log(`* Your goal is to get as close to ${Game.TARGET_SCORE} without going over.`);
     console.log(`* You start with $${Player.STARTING_MONEY}. For every win, you get $1. For every loss, you lose $1.`);
     console.log(`* The game ends when you're broke ($0) or when you're rich ($${Player.MONEY_GOAL}).`);
     console.log("");
